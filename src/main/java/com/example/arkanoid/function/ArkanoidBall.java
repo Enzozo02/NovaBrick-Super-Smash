@@ -2,64 +2,76 @@ package com.example.arkanoid.function;
 
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 
 public class ArkanoidBall {
     private Circle ball;
-    private double vitesseX = 1;
-    private double vitesseY = -1;
+    private double vitesseX = 2;
+    private double vitesseY = -2;
     private double radius = 10;
-    private double acceleration = 0.05;
-    private double maxSpeed = 8;
-
-    private boolean isAccelerated = false;
 
     public ArkanoidBall() {
-        ball = new Circle(radius, Color.RED);
-        // Position initiale de la balle centrée
+        ball = new Circle(radius, Color.WHITE);
         ball.setCenterX(400);
-        ball.setCenterY(500);
+        ball.setCenterY(300);
     }
 
     public Circle getBall() {
         return ball;
     }
 
-    public void centerBall(double sceneWidth, double sceneHeight) {
-        ball.setCenterX(sceneWidth / 2);
-        ball.setCenterY(sceneHeight / 2);
-    }
-
     public void move() {
         ball.setCenterX(ball.getCenterX() + vitesseX);
         ball.setCenterY(ball.getCenterY() + vitesseY);
-
-        if (isAccelerated) {
-            if (Math.abs(vitesseX) < maxSpeed) {
-                vitesseX += (vitesseX > 0) ? acceleration : -acceleration;
-            }
-            if (Math.abs(vitesseY) < maxSpeed) {
-                vitesseY += (vitesseY > 0) ? acceleration : -acceleration;
-            }
-            isAccelerated = false;
-        }
     }
 
     public void checkWallCollision(double sceneWidth, double sceneHeight) {
         if (ball.getCenterX() - radius <= 0 || ball.getCenterX() + radius >= sceneWidth) {
             vitesseX = -vitesseX;
-            isAccelerated = true;
         }
         if (ball.getCenterY() - radius <= 0) {
             vitesseY = -vitesseY;
-            isAccelerated = true;
         }
     }
 
-    public void checkVaisseauCollision(double vaisseauX, double vaisseauY, double vaisseauWidth, double vaisseauHeight) {
-        if (ball.getCenterY() + radius >= vaisseauY && ball.getCenterY() - radius <= vaisseauY + vaisseauHeight &&
-                ball.getCenterX() + radius >= vaisseauX && ball.getCenterX() - radius <= vaisseauX + vaisseauWidth) {
-            vitesseY = -vitesseY;
-            isAccelerated = true;
+    public boolean checkVaisseauCollision(double vaisseauX, double vaisseauY, double vaisseauWidth, double vaisseauHeight) {
+        double ballX = ball.getCenterX();
+        double ballY = ball.getCenterY();
+
+        boolean collision = ballX + radius >= vaisseauX && ballX - radius <= vaisseauX + vaisseauWidth &&
+                ballY + radius >= vaisseauY && ballY - radius <= vaisseauY + vaisseauHeight;
+
+        if (collision) {
+            vitesseY = -Math.abs(vitesseY);
         }
+
+        return collision;
+    }
+
+    public boolean checkBrickCollision(Rectangle brick) {
+        double ballX = ball.getCenterX();
+        double ballY = ball.getCenterY();
+        double brickX = brick.getX();
+        double brickY = brick.getY();
+        double brickWidth = brick.getWidth();
+        double brickHeight = brick.getHeight();
+
+        boolean collision = ballX + radius >= brickX && ballX - radius <= brickX + brickWidth &&
+                ballY + radius >= brickY && ballY - radius <= brickY + brickHeight;
+
+        if (collision) {
+            vitesseY = -vitesseY;
+        }
+
+        return collision;
+    }
+
+    public void resetPosition(double sceneWidth, double sceneHeight) {
+
+        ball.setCenterX(sceneWidth / 2);
+        ball.setCenterY(sceneHeight / 2);
+
+        vitesseX = Math.random() > 0.5 ? 2 : -2;
+        vitesseY = -2;
     }
 }

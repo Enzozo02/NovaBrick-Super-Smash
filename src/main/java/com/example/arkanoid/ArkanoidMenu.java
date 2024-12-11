@@ -20,7 +20,7 @@ public class ArkanoidMenu extends Application {
 
         mainMenuScene = createMainMenuScene(primaryStage);
 
-        primaryStage.setTitle("Arkanoïd Menu");
+        primaryStage.setTitle("NovaBrick-Super-Smash");
         primaryStage.setScene(mainMenuScene);
         primaryStage.setFullScreen(true);
         primaryStage.setResizable(false);
@@ -41,9 +41,8 @@ public class ArkanoidMenu extends Application {
         Button quitButton = new Button("Quitter");
 
         playButton.setOnAction(e -> {
-
             JeuArkanoid jeuArkanoid = new JeuArkanoid();
-            Scene gameScene = jeuArkanoid.createGameScene(primaryStage);
+            Scene gameScene = jeuArkanoid.createGameScene(primaryStage, this);
             primaryStage.setScene(gameScene);
             primaryStage.setFullScreen(true);
         });
