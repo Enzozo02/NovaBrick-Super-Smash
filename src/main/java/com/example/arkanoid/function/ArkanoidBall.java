@@ -42,11 +42,16 @@ public class ArkanoidBall {
                 ballY + radius >= vaisseauY && ballY - radius <= vaisseauY + vaisseauHeight;
 
         if (collision) {
+            double relativeX = ballX - (vaisseauX + vaisseauWidth / 2);
+            double reboundFactor = relativeX / (vaisseauWidth / 2);
             vitesseY = -Math.abs(vitesseY);
+            vitesseX += reboundFactor * 2;
         }
 
         return collision;
     }
+
+
 
     public boolean checkBrickCollision(Rectangle brick) {
         double ballX = ball.getCenterX();

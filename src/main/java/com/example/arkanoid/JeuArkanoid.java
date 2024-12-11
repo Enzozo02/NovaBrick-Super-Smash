@@ -7,8 +7,10 @@ import javafx.animation.AnimationTimer;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
+import javafx.scene.text.Text;
+import javafx.scene.text.Font;
+import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +25,6 @@ public class JeuArkanoid {
 
         Pane gameLayout = new Pane();
         gameLayout.setStyle("-fx-background-color: #000;");
-
         gameLayout.getChildren().addAll(vaisseau.getVaisseau(), ball.getBall());
 
         int rows = 4;
@@ -41,6 +42,18 @@ public class JeuArkanoid {
             }
         }
 
+        Text timerText = new Text();
+        timerText.setFont(Font.font(20));
+        timerText.setFill(Color.WHITE);
+        gameLayout.getChildren().add(timerText);
+
+        gameLayout.widthProperty().addListener((observable, oldValue, newValue) -> {
+            timerText.setX(newValue.doubleValue() - 200);
+        });
+        gameLayout.heightProperty().addListener((observable, oldValue, newValue) -> {
+            timerText.setY(newValue.doubleValue() - 20);
+        });
+
         Scene gameScene = new Scene(gameLayout, 800, 600);
 
         boolean[] keys = new boolean[256];
@@ -51,6 +64,8 @@ public class JeuArkanoid {
                 keys[KeyCode.Q.getCode()] = true;
             } else if (code == KeyCode.D) {
                 keys[KeyCode.D.getCode()] = true;
+            } else if (code == KeyCode.SPACE) {
+                vaisseau.activateSuperDash();
             }
         });
 
@@ -68,6 +83,7 @@ public class JeuArkanoid {
         AnimationTimer gameLoop = new AnimationTimer() {
             @Override
             public void handle(long now) {
+                vaisseau.update();
 
                 if (keys[KeyCode.Q.getCode()]) {
                     vaisseau.moveLeft();
@@ -92,17 +108,22 @@ public class JeuArkanoid {
                     }
                 }
 
-
                 if (ball.getBall().getCenterY() >= gameScene.getHeight()) {
                     vaisseau.perdreVie();
                     if (vaisseau.estMort()) {
                         stopGame(primaryStage, menu);
                         this.stop();
                     } else {
-
                         ball.resetPosition(gameScene.getWidth(), gameScene.getHeight());
                     }
                 }
+
+                long currentTime = System.nanoTime();
+                long timeRemaining = (vaisseau.isSuperDashActive())
+                        ? 0
+                        : Math.max(0, (vaisseau.getSuperDashCooldownEndTime() - currentTime) / 1000000000L);
+
+                timerText.setText("Super Dash: " + timeRemaining + "s");
             }
         };
         gameLoop.start();
@@ -111,9 +132,9 @@ public class JeuArkanoid {
     }
 
     private void stopGame(Stage primaryStage, ArkanoidMenu menu) {
-
         primaryStage.setScene(menu.getMainMenuScene());
         primaryStage.setFullScreen(true);
     }
 }
+
 
