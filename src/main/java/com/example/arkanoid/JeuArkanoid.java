@@ -66,8 +66,8 @@ public class JeuArkanoid {
         gameLayout.getChildren().add(livesText);
 
         gameLayout.widthProperty().addListener((observable, oldValue, newValue) -> {
-            timerText.setX(newValue.doubleValue() - 200);
-            scoreText.setX(newValue.doubleValue() - 1000);
+            timerText.setX(newValue.doubleValue() - 190);
+            scoreText.setX(newValue.doubleValue() / 2.1);
         });
         gameLayout.heightProperty().addListener((observable, oldValue, newValue) -> {
             timerText.setY(newValue.doubleValue() - 20);
