@@ -3,6 +3,7 @@ package com.example.arkanoid;
 import com.example.arkanoid.function.ArkanoidVaisseau;
 import com.example.arkanoid.function.ArkanoidBall;
 import com.example.arkanoid.function.ArkanoidBrick;
+import com.example.arkanoid.function.ArkanoidScore;
 import javafx.animation.AnimationTimer;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
@@ -17,11 +18,14 @@ import java.util.List;
 
 public class JeuArkanoid {
 
+    private ArkanoidScore score;
+
     public Scene createGameScene(Stage primaryStage, ArkanoidMenu menu) {
 
         ArkanoidVaisseau vaisseau = new ArkanoidVaisseau();
         ArkanoidBall ball = new ArkanoidBall();
         List<ArkanoidBrick> bricks = new ArrayList<>();
+        score = new ArkanoidScore();
 
         Pane gameLayout = new Pane();
         gameLayout.setStyle("-fx-background-color: #000;");
@@ -42,16 +46,33 @@ public class JeuArkanoid {
             }
         }
 
+        Text scoreText = new Text("Score: " + score.getScore());
+        scoreText.setFont(Font.font(20));
+        scoreText.setFill(Color.WHITE);
+        scoreText.setX(20);
+        scoreText.setY(gameLayout.getHeight() - 20);
+        gameLayout.getChildren().add(scoreText);
+
         Text timerText = new Text();
         timerText.setFont(Font.font(20));
         timerText.setFill(Color.WHITE);
         gameLayout.getChildren().add(timerText);
 
+        Text livesText = new Text("Vies restantes: " + vaisseau.getVies());
+        livesText.setFont(Font.font(20));
+        livesText.setFill(Color.WHITE);
+        livesText.setX(20);
+        livesText.setY(gameLayout.getHeight() - 20);
+        gameLayout.getChildren().add(livesText);
+
         gameLayout.widthProperty().addListener((observable, oldValue, newValue) -> {
             timerText.setX(newValue.doubleValue() - 200);
+            scoreText.setX(newValue.doubleValue() - 1000);
         });
         gameLayout.heightProperty().addListener((observable, oldValue, newValue) -> {
             timerText.setY(newValue.doubleValue() - 20);
+            livesText.setY(newValue.doubleValue() - 20);
+            scoreText.setY(newValue.doubleValue() - 20);
         });
 
         Scene gameScene = new Scene(gameLayout, 800, 600);
@@ -100,16 +121,24 @@ public class JeuArkanoid {
                 for (ArkanoidBrick brick : new ArrayList<>(bricks)) {
                     if (!brick.isBroken() && ball.checkBrickCollision(brick.getBrick())) {
                         brick.hit();
+                        score.incrementScoreOnTouch();
                         if (brick.isBroken()) {
                             gameLayout.getChildren().remove(brick.getBrick());
                             bricks.remove(brick);
+                            score.incrementScoreOnBreak();
                         }
                         break;
                     }
                 }
 
+                score.updateScoreWithTimeBonus();
+
+                scoreText.setText("Score: " + score.getScore());
+
                 if (ball.getBall().getCenterY() >= gameScene.getHeight()) {
                     vaisseau.perdreVie();
+                    livesText.setText("Vies restantes: " + vaisseau.getVies());
+
                     if (vaisseau.estMort()) {
                         stopGame(primaryStage, menu);
                         this.stop();
@@ -125,12 +154,9 @@ public class JeuArkanoid {
                     long dashRemaining = Math.max(0, (vaisseau.getSuperDashEndTime() - currentTime) / 1_000_000_000L);
                     timerText.setText("Super Dash actif: " + dashRemaining + "s");
                 } else {
-
                     if (cooldownRemaining > 0) {
-
                         timerText.setText("Rechargement: " + cooldownRemaining + "s");
                     } else {
-
                         timerText.setText("Super Dash prêt !");
                     }
                 }
