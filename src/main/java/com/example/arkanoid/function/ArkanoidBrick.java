@@ -1,7 +1,11 @@
 package com.example.arkanoid.function;
 
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ArkanoidBrick {
     private Rectangle brick;
@@ -47,5 +51,19 @@ public class ArkanoidBrick {
                 brick.setFill(Color.TRANSPARENT);
                 break;
         }
+    }
+
+    public static List<ArkanoidBrick> generateBricks(Pane gameLayout, int rows, int cols, double brickWidth, double brickHeight) {
+        List<ArkanoidBrick> bricks = new ArrayList<>();
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
+                double x = col * (brickWidth + 5) + 50;
+                double y = row * (brickHeight + 5) + 50;
+                ArkanoidBrick brick = new ArkanoidBrick(x, y, brickWidth, brickHeight, 3);
+                bricks.add(brick);
+                gameLayout.getChildren().add(brick.getBrick());
+            }
+        }
+        return bricks;
     }
 }

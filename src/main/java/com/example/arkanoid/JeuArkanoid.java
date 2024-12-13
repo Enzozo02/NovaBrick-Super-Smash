@@ -24,27 +24,13 @@ public class JeuArkanoid {
 
         ArkanoidVaisseau vaisseau = new ArkanoidVaisseau();
         ArkanoidBall ball = new ArkanoidBall();
-        List<ArkanoidBrick> bricks = new ArrayList<>();
         score = new ArkanoidScore();
 
         Pane gameLayout = new Pane();
         gameLayout.setStyle("-fx-background-color: #000;");
         gameLayout.getChildren().addAll(vaisseau.getVaisseau(), ball.getBall());
 
-        int rows = 4;
-        int cols = 21;
-        double brickWidth = 80;
-        double brickHeight = 30;
-
-        for (int row = 0; row < rows; row++) {
-            for (int col = 0; col < cols; col++) {
-                double x = col * (brickWidth + 5) + 50;
-                double y = row * (brickHeight + 5) + 50;
-                ArkanoidBrick brick = new ArkanoidBrick(x, y, brickWidth, brickHeight, 3);
-                bricks.add(brick);
-                gameLayout.getChildren().add(brick.getBrick());
-            }
-        }
+        List<ArkanoidBrick> bricks = ArkanoidBrick.generateBricks(gameLayout, 4, 21, 80, 30);
 
         Text scoreText = new Text("Score: " + score.getScore());
         scoreText.setFont(Font.font(20));
@@ -129,6 +115,10 @@ public class JeuArkanoid {
                         }
                         break;
                     }
+                }
+
+                if (bricks.isEmpty()) {
+                    bricks.addAll(ArkanoidBrick.generateBricks(gameLayout, 4, 21, 80, 30));
                 }
 
                 score.updateScoreWithTimeBonus();
