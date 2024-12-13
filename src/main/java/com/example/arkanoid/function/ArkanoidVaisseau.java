@@ -9,6 +9,7 @@ public class ArkanoidVaisseau {
     private int vies = 3;
     private boolean superDashActive = false;
     private long superDashEndTime = 0;
+    private long superDashCooldownEndTime = 0;
     private static final long SUPER_DASH_DURATION = 5000000000L;
     private static final long SUPER_DASH_COOLDOWN = 30000000000L;
 
@@ -36,10 +37,11 @@ public class ArkanoidVaisseau {
 
     public void activateSuperDash() {
         long currentTime = System.nanoTime();
-        if (!superDashActive && (currentTime - superDashEndTime) >= SUPER_DASH_COOLDOWN) {
+        if (!superDashActive && currentTime >= superDashCooldownEndTime) {
             superDashActive = true;
             vitesse = 14;
             superDashEndTime = currentTime + SUPER_DASH_DURATION;
+            superDashCooldownEndTime = superDashEndTime + SUPER_DASH_COOLDOWN;
         }
     }
 
@@ -80,8 +82,14 @@ public class ArkanoidVaisseau {
     }
 
     public long getSuperDashCooldownEndTime() {
+        return superDashCooldownEndTime;
+    }
+
+    public long getSuperDashEndTime() {
         return superDashEndTime;
     }
+
+    public static long getSuperDashDuration() {
+        return SUPER_DASH_DURATION;
+    }
 }
-
-

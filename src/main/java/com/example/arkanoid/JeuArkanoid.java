@@ -119,11 +119,21 @@ public class JeuArkanoid {
                 }
 
                 long currentTime = System.nanoTime();
-                long timeRemaining = (vaisseau.isSuperDashActive())
-                        ? 0
-                        : Math.max(0, (vaisseau.getSuperDashCooldownEndTime() - currentTime) / 1000000000L);
+                long cooldownRemaining = (vaisseau.getSuperDashCooldownEndTime() - currentTime) / 1_000_000_000L;
 
-                timerText.setText("Super Dash: " + timeRemaining + "s");
+                if (vaisseau.isSuperDashActive()) {
+                    long dashRemaining = Math.max(0, (vaisseau.getSuperDashEndTime() - currentTime) / 1_000_000_000L);
+                    timerText.setText("Super Dash actif: " + dashRemaining + "s");
+                } else {
+
+                    if (cooldownRemaining > 0) {
+
+                        timerText.setText("Rechargement: " + cooldownRemaining + "s");
+                    } else {
+
+                        timerText.setText("Super Dash prêt !");
+                    }
+                }
             }
         };
         gameLoop.start();
@@ -136,5 +146,3 @@ public class JeuArkanoid {
         primaryStage.setFullScreen(true);
     }
 }
-
-
