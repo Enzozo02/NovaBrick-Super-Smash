@@ -6,15 +6,18 @@ import javafx.scene.shape.Rectangle;
 public class ArkanoidVaisseau {
     private Rectangle vaisseau;
     private double vitesse = 7;
-    private int vies = 3;
+    private int vies = 4;
     private boolean superDashActive = false;
     private long superDashEndTime = 0;
     private long superDashCooldownEndTime = 0;
+    private boolean isExpanded = false;
+    private long expandEndTime = 0;
     private static final long SUPER_DASH_DURATION = 5000000000L;
     private static final long SUPER_DASH_COOLDOWN = 30000000000L;
+    private static final long EXPAND_DURATION = 10000000000L;
 
     public ArkanoidVaisseau() {
-        vaisseau = new Rectangle(100, 20, Color.GREEN);
+        vaisseau = new Rectangle(100, 20, Color.WHITE);
         vaisseau.setX(350);
         vaisseau.setY(920);
     }
@@ -45,11 +48,21 @@ public class ArkanoidVaisseau {
         }
     }
 
+    public void activateExpand() {
+        isExpanded = true;
+        expandEndTime = System.nanoTime() + EXPAND_DURATION;
+        vaisseau.setWidth(400);
+    }
+
     public void update() {
         long currentTime = System.nanoTime();
         if (superDashActive && currentTime >= superDashEndTime) {
             superDashActive = false;
             vitesse = 7;
+        }
+        if (isExpanded && currentTime >= expandEndTime) {
+            isExpanded = false;
+            vaisseau.setWidth(100);
         }
     }
 
@@ -64,12 +77,20 @@ public class ArkanoidVaisseau {
         }
     }
 
+    public void ajouterVie() {
+        if (vies < 5) {
+            vies++;
+            mettreAJourCouleur();
+        }
+    }
+
     private void mettreAJourCouleur() {
         switch (vies) {
+            case 5 -> vaisseau.setFill(Color.BLUE);
+            case 4 -> vaisseau.setFill(Color.WHITE);
             case 3 -> vaisseau.setFill(Color.GREEN);
             case 2 -> vaisseau.setFill(Color.YELLOW);
             case 1 -> vaisseau.setFill(Color.RED);
-            default -> vaisseau.setFill(Color.GRAY);
         }
     }
 
@@ -87,9 +108,5 @@ public class ArkanoidVaisseau {
 
     public long getSuperDashEndTime() {
         return superDashEndTime;
-    }
-
-    public static long getSuperDashDuration() {
-        return SUPER_DASH_DURATION;
     }
 }

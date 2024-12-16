@@ -5,6 +5,7 @@ import com.example.arkanoid.function.ArkanoidBall;
 import com.example.arkanoid.function.ArkanoidBrick;
 import com.example.arkanoid.function.ArkanoidScore;
 import com.example.arkanoid.function.ArkanoidGameover;
+import com.example.arkanoid.function.ArkanoidBonus;
 import javafx.animation.AnimationTimer;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
@@ -16,6 +17,7 @@ import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class JeuArkanoid {
 
@@ -103,6 +105,9 @@ public class JeuArkanoid {
         gameLayout.requestFocus();
 
         AnimationTimer gameLoop = new AnimationTimer() {
+            List<ArkanoidBonus> activeBonuses = new ArrayList<>();
+            Random random = new Random();
+
             @Override
             public void handle(long now) {
                 if (!gameStarted[0] || isGameOver) {
@@ -131,8 +136,34 @@ public class JeuArkanoid {
                             gameLayout.getChildren().remove(brick.getBrick());
                             bricks.remove(brick);
                             score.incrementScoreOnBreak();
+
+                            if (random.nextDouble() < 0.2) {
+                                String bonusType = random.nextDouble() < 0.5 ? "expand" : "life";
+                                ArkanoidBonus bonus = new ArkanoidBonus(brick.getBrick().getX(), brick.getBrick().getY(), bonusType);
+                                activeBonuses.add(bonus);
+                                gameLayout.getChildren().add(bonus.getBonus());
+                            }
                         }
                         break;
+                    }
+                }
+
+                for (ArkanoidBonus bonus : new ArrayList<>(activeBonuses)) {
+                    if (bonus.isActive()) {
+                        bonus.move();
+                        if (bonus.checkCollision(vaisseau.getVaisseau())) {
+                            if (bonus.getType().equals("expand")) {
+                                vaisseau.activateExpand();
+                            } else if (bonus.getType().equals("life")) {
+                                vaisseau.ajouterVie();
+                                livesText.setText("Vies restantes: " + vaisseau.getVies());
+                            }
+                            gameLayout.getChildren().remove(bonus.getBonus());
+                            activeBonuses.remove(bonus);
+                        }
+                    } else {
+                        gameLayout.getChildren().remove(bonus.getBonus());
+                        activeBonuses.remove(bonus);
                     }
                 }
 
@@ -141,7 +172,6 @@ public class JeuArkanoid {
                 }
 
                 score.updateScoreWithTimeBonus();
-
                 scoreText.setText("Score: " + score.getScore());
 
                 if (ball.getBall().getCenterY() >= gameScene.getHeight()) {

@@ -17,7 +17,6 @@ public class ArkanoidMenu extends Application {
 
         OptionsMenu optionsMenu = new OptionsMenu();
         optionsMenuScene = optionsMenu.getScene(primaryStage, this);
-
         mainMenuScene = createMainMenuScene(primaryStage);
 
         primaryStage.setTitle("NovaBrick-Super-Smash");
