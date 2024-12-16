@@ -4,6 +4,7 @@ import com.example.arkanoid.function.ArkanoidVaisseau;
 import com.example.arkanoid.function.ArkanoidBall;
 import com.example.arkanoid.function.ArkanoidBrick;
 import com.example.arkanoid.function.ArkanoidScore;
+import com.example.arkanoid.function.ArkanoidGameover;
 import javafx.animation.AnimationTimer;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
@@ -19,8 +20,9 @@ import java.util.List;
 public class JeuArkanoid {
 
     private ArkanoidScore score;
+    private boolean isGameOver = false;
 
-    public Scene createGameScene(Stage primaryStage, ArkanoidMenu menu) {
+    public Scene createGameScene(Stage primaryStage, ArkanoidMenu menuPrincipal) {
 
         ArkanoidVaisseau vaisseau = new ArkanoidVaisseau();
         ArkanoidBall ball = new ArkanoidBall();
@@ -51,19 +53,27 @@ public class JeuArkanoid {
         livesText.setY(gameLayout.getHeight() - 20);
         gameLayout.getChildren().add(livesText);
 
+        Text startText = new Text("Appuyez sur Entrée pour commencer");
+        startText.setFont(Font.font(30));
+        startText.setFill(Color.YELLOW);
+        gameLayout.getChildren().add(startText);
+
         gameLayout.widthProperty().addListener((observable, oldValue, newValue) -> {
             timerText.setX(newValue.doubleValue() - 190);
             scoreText.setX(newValue.doubleValue() / 2.1);
+            startText.setX((newValue.doubleValue() - startText.getBoundsInLocal().getWidth()) / 2);
         });
         gameLayout.heightProperty().addListener((observable, oldValue, newValue) -> {
             timerText.setY(newValue.doubleValue() - 20);
             livesText.setY(newValue.doubleValue() - 20);
             scoreText.setY(newValue.doubleValue() - 20);
+            startText.setY((newValue.doubleValue() - startText.getBoundsInLocal().getHeight()) / 2);
         });
 
         Scene gameScene = new Scene(gameLayout, 800, 600);
 
         boolean[] keys = new boolean[256];
+        final boolean[] gameStarted = {false};
 
         gameScene.setOnKeyPressed(event -> {
             KeyCode code = event.getCode();
@@ -73,6 +83,11 @@ public class JeuArkanoid {
                 keys[KeyCode.D.getCode()] = true;
             } else if (code == KeyCode.SPACE) {
                 vaisseau.activateSuperDash();
+            } else if (code == KeyCode.ENTER) {
+                if (!gameStarted[0]) {
+                    gameStarted[0] = true;
+                    gameLayout.getChildren().remove(startText);
+                }
             }
         });
 
@@ -90,6 +105,10 @@ public class JeuArkanoid {
         AnimationTimer gameLoop = new AnimationTimer() {
             @Override
             public void handle(long now) {
+                if (!gameStarted[0] || isGameOver) {
+                    return;
+                }
+
                 vaisseau.update();
 
                 if (keys[KeyCode.Q.getCode()]) {
@@ -130,7 +149,7 @@ public class JeuArkanoid {
                     livesText.setText("Vies restantes: " + vaisseau.getVies());
 
                     if (vaisseau.estMort()) {
-                        stopGame(primaryStage, menu);
+                        triggerGameOver(primaryStage, menuPrincipal);
                         this.stop();
                     } else {
                         ball.resetPosition(gameScene.getWidth(), gameScene.getHeight());
@@ -157,8 +176,11 @@ public class JeuArkanoid {
         return gameScene;
     }
 
-    private void stopGame(Stage primaryStage, ArkanoidMenu menu) {
-        primaryStage.setScene(menu.getMainMenuScene());
-        primaryStage.setFullScreen(true);
+    private void triggerGameOver(Stage primaryStage, ArkanoidMenu menuPrincipal) {
+        if (!isGameOver) {
+            isGameOver = true;
+            ArkanoidGameover gameOver = new ArkanoidGameover();
+            gameOver.showGameOverScene(primaryStage, menuPrincipal.getMainMenuScene(), score);
+        }
     }
 }
