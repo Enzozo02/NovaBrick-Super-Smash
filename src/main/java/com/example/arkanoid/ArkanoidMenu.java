@@ -10,13 +10,10 @@ import javafx.scene.input.KeyEvent;
 public class ArkanoidMenu extends Application {
 
     private Scene mainMenuScene;
-    private Scene optionsMenuScene;
 
     @Override
     public void start(Stage primaryStage) {
 
-        OptionsMenu optionsMenu = new OptionsMenu();
-        optionsMenuScene = optionsMenu.getScene(primaryStage, this);
         mainMenuScene = createMainMenuScene(primaryStage);
 
         primaryStage.setTitle("NovaBrick-Super-Smash");
@@ -36,7 +33,6 @@ public class ArkanoidMenu extends Application {
     private Scene createMainMenuScene(Stage primaryStage) {
 
         Button playButton = new Button("Jouer");
-        Button optionsButton = new Button("Options");
         Button quitButton = new Button("Quitter");
 
         playButton.setOnAction(e -> {
@@ -46,14 +42,9 @@ public class ArkanoidMenu extends Application {
             primaryStage.setFullScreen(true);
         });
 
-        optionsButton.setOnAction(e -> {
-            primaryStage.setScene(optionsMenuScene);
-            primaryStage.setFullScreen(true);
-        });
-
         quitButton.setOnAction(e -> primaryStage.close());
 
-        VBox vbox = new VBox(20, playButton, optionsButton, quitButton);
+        VBox vbox = new VBox(20, playButton, quitButton);
         vbox.setStyle("-fx-alignment: center; -fx-padding: 20;");
         return new Scene(vbox, 400, 300);
     }

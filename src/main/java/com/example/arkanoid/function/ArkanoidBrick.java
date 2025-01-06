@@ -6,6 +6,7 @@ import javafx.scene.shape.Rectangle;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class ArkanoidBrick {
     private Rectangle brick;
@@ -55,11 +56,14 @@ public class ArkanoidBrick {
 
     public static List<ArkanoidBrick> generateBricks(Pane gameLayout, int rows, int cols, double brickWidth, double brickHeight) {
         List<ArkanoidBrick> bricks = new ArrayList<>();
+        Random random = new Random();
+
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
                 double x = col * (brickWidth + 5) + 50;
                 double y = row * (brickHeight + 5) + 50;
-                ArkanoidBrick brick = new ArkanoidBrick(x, y, brickWidth, brickHeight, 3);
+                int randomDurability = random.nextInt(3) + 1;  // Durability between 1 and 3
+                ArkanoidBrick brick = new ArkanoidBrick(x, y, brickWidth, brickHeight, randomDurability);
                 bricks.add(brick);
                 gameLayout.getChildren().add(brick.getBrick());
             }
