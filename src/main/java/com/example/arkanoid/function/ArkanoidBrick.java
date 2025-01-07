@@ -62,7 +62,7 @@ public class ArkanoidBrick {
             for (int col = 0; col < cols; col++) {
                 double x = col * (brickWidth + 5) + 50;
                 double y = row * (brickHeight + 5) + 50;
-                int randomDurability = random.nextInt(3) + 1;  // Durability between 1 and 3
+                int randomDurability = random.nextInt(3) + 1;
                 ArkanoidBrick brick = new ArkanoidBrick(x, y, brickWidth, brickHeight, randomDurability);
                 bricks.add(brick);
                 gameLayout.getChildren().add(brick.getBrick());

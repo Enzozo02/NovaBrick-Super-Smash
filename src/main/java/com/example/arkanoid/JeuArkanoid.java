@@ -11,8 +11,6 @@ import javafx.stage.Stage;
 import javafx.scene.text.Text;
 import javafx.scene.text.Font;
 import javafx.scene.paint.Color;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -134,7 +132,7 @@ public class JeuArkanoid {
             Random random = new Random();
 
             {
-                balls.add(mainBall); // Ajouter la balle principale
+                balls.add(mainBall);
             }
 
             @Override
@@ -216,7 +214,6 @@ public class JeuArkanoid {
                     if (bonus.isActive()) {
                         bonus.move();
 
-                        // Vérifier collision avec le vaisseau
                         if (bonus.checkCollision(vaisseau.getVaisseau())) {
                             bonus.playBonusSound();
                             switch (bonus.getType()) {
@@ -239,22 +236,17 @@ public class JeuArkanoid {
                                     break;
 
                                 default:
-                                    // Si le type du bonus n'est pas géré, on peut loguer un avertissement
                                     System.out.println("Type de bonus inconnu : " + bonus.getType());
                                     break;
                             }
-
-                            // Supprimer le bonus après utilisation
                             gameLayout.getChildren().remove(bonus.getBonus());
                             activeBonuses.remove(bonus);
                         }
-                        // Vérifier si le bonus est tombé hors de l'écran
                         else if (bonus.getBonus().getBoundsInParent().getMaxY() >= gameScene.getHeight()) {
                             gameLayout.getChildren().remove(bonus.getBonus());
                             activeBonuses.remove(bonus);
                         }
                     } else {
-                        // Supprimer les bonus inactifs
                         gameLayout.getChildren().remove(bonus.getBonus());
                         activeBonuses.remove(bonus);
                     }
